@@ -17,8 +17,8 @@ class AddLinkedList:
         carry = 0
 
         while l1 or l2 or carry!=0:
-            digit1 = l1._data if l1 else 0
-            digit2 = l2._data if l2 else 0
+            digit1 = l1.data if l1 else 0
+            digit2 = l2.data if l2 else 0
 
             sum = digit1 + digit2 + carry
             digit = sum % 10
@@ -26,14 +26,14 @@ class AddLinkedList:
 
             # Create a Node containing the digit
             newNode = Node(digit)
-            ptr._next = newNode
-            ptr = ptr._next
+            ptr.next = newNode
+            ptr = ptr.next
 
-            l1 = l1._next if l1 else None
-            l2 = l2._next if l2 else None
+            l1 = l1.next if l1 else None
+            l2 = l2.next if l2 else None
 
-        result = dummyHead._next
-        dummyHead._next = None
+        result = dummyHead.next
+        dummyHead.next = None
         return result
 
 
@@ -42,8 +42,8 @@ class AddLinkedList:
         :param head: head node of linked list
         :return: None'''
         while head:
-            print(head._data, end=" -> ")
-            head = head._next
+            print(head.data, end=" -> ")
+            head = head.next
         print("None")
 
 
@@ -52,14 +52,10 @@ if __name__ == '__main__':
     obj = AddLinkedList()
 
     l1 = LinkedList()
-    l1.insert_at_begining(9)
-    # for i in range(5):
-    #     l1.insert_at_begining(9)
+    l1.insert(9)
 
     l2 = LinkedList()
-    l2.insert_at_begining(9)
-    # for i in range(1, 6):
-    #     l2.insert_at_begining(i)
+    l2.insert(9)
 
     obj.print_linked_list(l1.head)
     obj.print_linked_list(l2.head)
