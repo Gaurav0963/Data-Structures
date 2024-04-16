@@ -1,4 +1,6 @@
-
+'''
+Reverse a singly linked list
+'''
 
 from LinkedList import LinkedList, Node
 

@@ -2,7 +2,7 @@
 This is Singly Linked List Data Structure which consists of Nodes:
 Nodes contain data and link to next node:
     - Head Node: First node, the address of the head node gives us access of the complete list.
-    - Tail Node: Last Node, helps delete the last node in constant time, points to Null.
+    - Tail Node: Last Node, faster insertion at end of linked list, points to Null.
 '''
 
 from typing import Any, Optional, Union
@@ -68,7 +68,7 @@ class LinkedList:
         self.tail = newNode
         self.size += 1
 
-    def insert(self, data: Any, position: int = 0):
+    def insert(self, data: Any, position: int = 0) -> None:
         '''Inserts the data at the given position of the linked list, by default at the beginning of the linked list
         :param data: element to be inserted at the given position of the linked list
         :param position: position of the element to be inserted in the linked list
@@ -107,7 +107,7 @@ class LinkedList:
         self.size += 1
 
 
-    def delete_last_node(self):
+    def delete_last_node(self) -> Any:
         '''Deletes the last node the linked list
         :return: deleted node of linked list'''
         if self.isEmpty():
@@ -135,7 +135,7 @@ class LinkedList:
         if self.head is None:
             raise ValueError("The linked list is empty")
 
-        elif position == 0 and current is not None:
+        elif position == 0:
             self.head = current.next
             self.size -= 1
             return self.head
@@ -144,7 +144,7 @@ class LinkedList:
             for idx in range(position):
                 if current is None:
                     raise ValueError("Out of bound")
-                if position == idx + 1:
+                elif position == idx + 1:
                     element = current.data
                     current.next = current.next.next
                     self.size -= 1
@@ -162,4 +162,3 @@ class LinkedList:
                 return idx
             current = current.next
         return -1
-
