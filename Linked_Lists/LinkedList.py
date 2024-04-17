@@ -3,6 +3,7 @@ This is Singly Linked List Data Structure which consists of Nodes:
 Nodes contain data and link to next node:
     - Head Node: First node, the address of the head node gives us access of the complete list.
     - Tail Node: Last Node, faster insertion at end of linked list, points to Null.
+Note: All nodes in the linked list are 0-indexed.
 '''
 
 from typing import Any, Optional, Union
@@ -68,38 +69,41 @@ class LinkedList:
         self.tail = newNode
         self.size += 1
 
-    def insert(self, data: Any, position: int = 0) -> None:
+    def insert(self, data: Any, index: int = 0) -> None:
         '''Inserts the data at the given position of the linked list, by default at the beginning of the linked list
         :param data: element to be inserted at the given position of the linked list
-        :param position: position of the element to be inserted in the linked list
+        :param index: position of the element to be inserted in the linked list
         :return: None'''
 
-        if position < 0:
-            raise ValueError("Position must be greater than or equal to 0")
+        if index < 0:
+            raise ValueError("Index must be Non-Negative")
+
+        elif index > self.size:
+            raise ValueError("Index={} exceeds linked list size={}".format(index, self.size))
 
         current = self.head
-        if current is None:
-            new_node = Node(data, None)
+
+        if current is None and index == 0:
+            new_node = Node(data, self.head)
             self.head = new_node
             self.tail = new_node
 
-        elif position == 0:
+        elif index == 0 and current is not None:
             new_node = Node(data, self.head)
             self.head = new_node
 
-        elif position == self.size:
+        # Using tail to insert node at end of LinkedList in O(1) or constant time
+        elif index == self.size:
             new_node = Node(data, None)
             self.tail.next = new_node
             self.tail = new_node
 
         # Traversing to (position-1)th node
         else:
-            for _ in range(position - 1):
+            for _ in range(index - 1):
                 current = current.next
-                if current is None:
-                    raise ValueError("Position={} exceeds linked list size={}".format(position, self.size))
 
-            # Create a node with given data & current._next connect this node to the next node in LinkedList.
+            # Create a node with given data & current._next connects this node to the next node in LinkedList.
             new_node = Node(data, current.next)
 
             # Connect the current node to the node we created
@@ -111,7 +115,7 @@ class LinkedList:
         '''Deletes the last node the linked list
         :return: deleted node of linked list'''
         if self.isEmpty():
-            raise ValueError("The linked list is empty")
+            raise ValueError("The linked list is EMPTY")
 
         current = self.head
         for _ in range(self.size):
@@ -122,34 +126,39 @@ class LinkedList:
                 return data
             current = current.next
 
-    def delete(self, position: int = 0) -> Union[Node, Any]:
+    def delete(self, index: int = 0) -> Union[Node, Any]:
         '''Deletes the element at the given position from the linked list.
         By default, node at the beginning of the linked list is deleted.
-        :param position: position of the element to be deleted from the linked list, position must be >= 1
+        :param index: Index of the element to be deleted from the linked list, index must be >= 0
         :return: deleted element at the given position from the linked list'''
-        if position < 0:
-            raise ValueError("Position must be greater than or equal to 0")
+        if index < 0:
+            raise ValueError("Index must be Non-Negative")
+
+        # For a linkedlist of size = n, Maximum possible index = n-1
+        elif index >= self.size:
+            raise ValueError('''Index Out of Bound.
+            Max allowed Index={}, Index given={}'''.format(self.size-1, index))
 
         current = self.head
 
         if self.head is None:
-            raise ValueError("The linked list is empty")
+            raise ValueError("The linked list is EMPTY")
 
-        elif position == 0:
+        elif index == 0:
             self.head = current.next
+            del current
             self.size -= 1
-            return self.head
+            return
 
         else:
-            for idx in range(position):
-                if current is None:
-                    raise ValueError("Out of bound")
-                elif position == idx + 1:
-                    element = current.data
-                    current.next = current.next.next
-                    self.size -= 1
-                    return element
+            for idx in range(index - 1):
+                if current is None or current.next is None:
+                    return
                 current = current.next
+            next_node = current.next.next
+            del current.next
+            current.next = next_node
+            self.size -= 1
 
 
     def search_index(self, element) -> int:
