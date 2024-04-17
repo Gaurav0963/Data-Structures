@@ -1,0 +1,7 @@
+*.zip
+.idea/
+Linked_Lists/__pycache__/
+Linked_Lists/a.py
+Linked_Lists/b.py
+check.py
+
