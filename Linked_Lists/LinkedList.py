@@ -27,12 +27,12 @@ class LinkedList:
     :param tail: contains tail node of the linked list
     :param size: size of the linked list'''
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.head: Node | None = None
         self.tail: Optional[Node] = None
         self.size = 0
 
-    def __len__(self):
+    def __len__(self) -> int:
         ''':return: returns the size of the linked list'''
         return self.size
 
@@ -48,16 +48,20 @@ class LinkedList:
             return ""
         else:
             current = self.head
-            node_str = ""
             nodeList: list[str] = []
             while current:
                 nodeList.append(str(current.data))
                 current = current.next
-            node_str = " -> ".join(nodeList)
+            return " -> ".join(nodeList)
 
-            return node_str
+    def addAtHead(self, value: Any) -> None:
+        new_node = Node(value, self.head)
+        if self.head is None:
+            self.tail = new_node
+        self.head = new_node
+        self.size += 1
 
-    def insert_at_end(self, data):
+    def addAtTail(self, data: Any) -> None:
         '''Inserts the data at the end of the linked list
         :param data: element to be inserted at the end of the linked list
         :return: None'''
@@ -65,13 +69,15 @@ class LinkedList:
         if self.isEmpty():
             self.head = newNode
         else:
+            # Using tail to insert node at end of LinkedList in O(1) or constant time
             self.tail.next = newNode
         self.tail = newNode
         self.size += 1
 
-    def insert(self, data: Any, index: int = 0) -> None:
-        '''Inserts the data at the given position of the linked list, by default at the beginning of the linked list
-        :param data: element to be inserted at the given position of the linked list
+    def addAtIndex(self, value: Any, index: int = 0) -> None:
+        '''Adds data at the given index in the linked list.
+         By default, adds data at the beginning of the linked list.
+        :param value: element to be inserted at the given position of the linked list
         :param index: position of the element to be inserted in the linked list
         :return: None'''
 
@@ -83,91 +89,100 @@ class LinkedList:
 
         current = self.head
 
+        # In empty list, insertion is possible only at index == 0.
+        # If list is empty & index != 0 (say 3) then insertion should NOT be possible.
         if current is None and index == 0:
-            new_node = Node(data, self.head)
-            self.head = new_node
-            self.tail = new_node
+            self.addAtHead(value=value)
 
+        # Adding Node at head, if list is not empty
         elif index == 0 and current is not None:
-            new_node = Node(data, self.head)
-            self.head = new_node
+            self.addAtHead(value)
 
-        # Using tail to insert node at end of LinkedList in O(1) or constant time
         elif index == self.size:
-            new_node = Node(data, None)
-            self.tail.next = new_node
-            self.tail = new_node
+            self.addAtTail(value)
 
-        # Traversing to (position-1)th node
+        # To add Node before index, traversing to index-1 position.
         else:
             for _ in range(index - 1):
                 current = current.next
-
-            # Create a node with given data & current._next connects this node to the next node in LinkedList.
-            new_node = Node(data, current.next)
-
-            # Connect the current node to the node we created
+            new_node = Node(value, current.next)
             current.next = new_node
-        self.size += 1
+            self.size += 1
 
-
-    def delete_last_node(self) -> Any:
+    def deleteAtTail(self) -> Any:
         '''Deletes the last node the linked list
         :return: deleted node of linked list'''
         if self.isEmpty():
             raise ValueError("The linked list is EMPTY")
-
         current = self.head
         for _ in range(self.size):
             if current.next.next is None:
                 data = current.next.data
+                # After deleting last Node, tail pointer is set to Null,
+                # we need to set tail pointer to the updated last Node.
+                self.tail = current
                 current.next = None
                 self.size -= 1
                 return data
             current = current.next
 
-    def delete(self, index: int = 0) -> Union[Node, Any]:
-        '''Deletes the element at the given position from the linked list.
-        By default, node at the beginning of the linked list is deleted.
+    def deleteAtIndex(self, index: int = 0) -> Union[Node, Any]:
+        '''Deletes node at the given index in the linked list.
+        By default, node at the beginning (index=0) of the linked list will be deleted.
         :param index: Index of the element to be deleted from the linked list, index must be >= 0
         :return: deleted element at the given position from the linked list'''
         if index < 0:
             raise ValueError("Index must be Non-Negative")
 
-        # For a linkedlist of size = n, Maximum possible index = n-1
-        elif index >= self.size:
-            raise ValueError('''Index Out of Bound.
-            Max allowed Index={}, Index given={}'''.format(self.size-1, index))
-
-        current = self.head
-
-        if self.head is None:
+        elif self.head is None:
             raise ValueError("The linked list is EMPTY")
 
-        elif index == 0:
-            self.head = current.next
-            del current
-            self.size -= 1
-            return
-
         else:
-            for idx in range(index - 1):
-                if current is None or current.next is None:
-                    return
+            cur: Node = self.head
+            prev: Node | None = None
+            count: int = 0
+            while cur.next is not None and count < index:
+                prev = cur
+                cur = cur.next
+                count += 1
+            if index == 0:
+                self.head = cur.next
+                val = cur.data
+                self.size -= 1
+                del cur
+                return val
+
+            elif count == index:
+                val = cur.data
+                prev.next = cur.next
+                # cur.next is None implies we are at the Last Node.
+                # If the last Node is deleted then tail will be set to None,
+                # which will break adAtTail method. Therefore, setting last node as Tail
+                if cur.next is None:
+                    self.tail = prev
+                self.size -= 1
+                del cur
+                return val
+
+            elif cur.next is None:
+                return None
+
+    def get(self, index: int) -> int:
+        '''
+        Get the value of the index-th node in the linked list. If the index is invalid, return -1.
+        :param index: Index of the element to be retrieved from the linked list.
+        :return: value of the index-th node in the linked list
+        '''
+        if index < 0 or index >= self.size:
+            return -1
+        elif index == 0:
+            return self.head.data
+        elif index == self.size - 1:
+            return self.tail.data
+        else:
+            current = self.head
+            count = 0
+            while current is not None and count < index:
                 current = current.next
-            next_node = current.next.next
-            del current.next
-            current.next = next_node
-            self.size -= 1
-
-
-    def search_index(self, element) -> int:
-        '''Checks if element is present in the linked list
-        :param element: element to be searched
-        :return: index of the element present in the linked list'''
-        current = self.head
-        for idx in range(self.size):
-            if element == current.data:
-                return idx
-            current = current.next
-        return -1
+                count += 1
+            return current.data
